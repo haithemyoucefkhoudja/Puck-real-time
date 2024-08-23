@@ -21,9 +21,9 @@ export async function generateMetadata({
   params: { puckPath: string[] };
 }): Promise<Metadata> {
   const path = `/${puckPath.join("/")}`;
-
+  const pageData = getPage(path)
   return {
-    title: getPage(path)?.root.props.title,
+    title: pageData?.root.props.title,
   };
 }
 

@@ -1,12 +1,12 @@
-import { DefaultRootProps, DropZone, type Config } from "@measured/puck";
+import { DefaultRootProps, DropZone, type Config} from "@measured/puck";
 import { ReactNode } from "react";
 import BoxModelComponent from "./components/BoxModelComponent";
 import { ClassNameProvider } from "./providers/classNameProvider";
-import { CssWorkers } from "./lib/CssWorker";
+import { CssWorker } from "./lib/CssWorker";
 
 type Props = {
   Block:{
-    worker:CssWorkers,
+    worker:CssWorker,
   };
 };
 
@@ -52,18 +52,19 @@ const config:Config<Props, DefaultRootProps, 'Layout' | 'Elements'> = {
       fields:{
         worker: {
           type: "custom",
-          render: ({ name, onChange, value, }) => {
-            return (<ClassNameProvider  onChange={onChange} value={value}>
-              <BoxModelComponent />
-            </ClassNameProvider>);
+          render: ({ name, onChange, value, id }) => {
+            return (
+              <ClassNameProvider id={id}  onChange={onChange} value={value}>
+                <BoxModelComponent />
+              </ClassNameProvider>
+            );
           }
         }
       },
       render:(props)=>{
         const worker = props.worker;
-        
         if(worker) {
-          return <h1  {...worker}>hello</h1>
+          return <h1 className={`${worker.className}`}>hello</h1>
         }
       }
     },

@@ -1,18 +1,1 @@
-{
-    "/": {
-        "content": [
-            {
-                "type": "Block",
-                "props": {
-                    "tag": "h1",
-                    "id": "HeadingBlock-1694032984497"
-                }
-            }
-        ],
-        "root": {
-            "props": {
-                "title": ""
-            }
-        }
-    }
-}
+{"/":{"content":[{"type":"Block","props":{"tag":"h1","id":"HeadingBlock-1694032984497","worker":{"style_name":"style-HeadingBlock-1694032984497_worker","className":"h-[58px]","blob_url":"blob:http://localhost:3000/b56fb303-990f-4ae5-ac59-f555ab43d3d7"}}}],"root":{"props":{"title":""}},"zones":{}}}

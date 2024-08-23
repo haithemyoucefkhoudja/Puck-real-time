@@ -73,13 +73,11 @@ const BorderColorChanger = () => {
         }}
       />
     </button>
-    
-        {/* TODO: is Height and Width vw and vh */}
+{/*     
         <SelectionOptions status={['px', 'rem', '%',]} onChange={function (current: string): void {
-          throw new Error('Function not implemented.');
         } }>
 
-        </SelectionOptions>
+        </SelectionOptions> */}
     </div>
 
       {selectedOption === 'two-Axis' && (

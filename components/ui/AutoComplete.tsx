@@ -1,29 +1,27 @@
 import React, {  useState } from "react";
 import Autosuggest from "react-autosuggest";
 import { useClassName } from "../../providers/classNameProvider";
+import useActivatedCssRule from "../../hooks/usecssSelector";
 type TAutoSuggestComponent = {
   values:string[],
   presecsessor:string,
   unit: string,
   cssRule:string;
+  handleDimensionChange:(dimension: string, value: string)=>void
+  dimensions:Record<string, any>
 };
-function getStyleForRule(rule) {
-  const styleElement = document.createElement('style');
-  styleElement.type = 'text/css';
-  styleElement.appendChild(document.createTextNode(rule));
-  return styleElement;
-}
 
-function AutoSuggestComponent ({values, presecsessor, unit, cssRule}:TAutoSuggestComponent) {
+const targetParams = [['height', 'h-'], ['width', 'w-']];
+
+function AutoSuggestComponent ({dimensions, handleDimensionChange, values, presecsessor, unit, cssRule}:TAutoSuggestComponent) {
   
-  const [value, setValue] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const {appendClassName, injectRuleCss, removeRuleCss, removeClassName, OldValue} = useClassName()
   
+  const ActivatedCssRule = useActivatedCssRule(targetParams);
   
   const onChange = (event, { newValue }) => {
-    const Key = `${cssRule}`
-    setValue(newValue);
+    handleDimensionChange(cssRule, newValue);
     if(!newValue) {
       //removeRuleCss(Key); 
       removeClassName(presecsessor); return;
@@ -55,7 +53,7 @@ function AutoSuggestComponent ({values, presecsessor, unit, cssRule}:TAutoSugges
 
   const inputProps = {
     placeholder: cssRule,
-    value,
+    value:dimensions[ActivatedCssRule[0]][cssRule],
     onChange: onChange
   };
 

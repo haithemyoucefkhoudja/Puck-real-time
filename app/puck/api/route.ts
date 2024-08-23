@@ -10,7 +10,6 @@ export async function POST(request: Request) {
       ? fs.readFileSync("database.json", "utf-8")
       : "{}"
   );
-
   const updatedData = {
     ...existingData,
     [payload.path]: payload.data,

@@ -1,24 +1,24 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useInsertionEffect } from 'react';
 import { cn } from '../lib/utils';
-import { CssWorkers } from '../lib/CssWorker';
+import { CssWorker } from '../lib/CssWorker';
 
 interface ClassNameContextType {
-  className: Array<string>;
+  classNames: Array<string>;
   appendClassName: (presecsessor: string, value:string) => void;
   injectRuleCss: (newCssClass:string) => void;
   removeRuleCss:(cssProperty: string) => void;
   removeClassName:(presecsessor: string) => void;
-  OldValue:CssWorkers
+  OldValue:CssWorker,
 }
-type Model = {onChange: (value: CssWorkers) => void, value: CssWorkers}
+type Model = {onChange: (value: CssWorker) => void, value: CssWorker, id: string}
 
 const ClassNameContext = createContext<ClassNameContextType | undefined>(undefined);
 
-export const ClassNameProvider: React.FC<{ children: ReactNode } & Model> = ({ children, onChange, value }) => {
-  const [_Blobobj, setBlob] = useState<Blob | null>(null);
-  const [Blob_Url, setBlobUrl] = useState<string | null>(null);
-  const [className, setClassName] = useState<Array<string>>([]);
-  const [Rules, setRules] = useState<Set<string>>(new Set());
+export const ClassNameProvider: React.FC<{ children: ReactNode } & Model> = ({ children, onChange, value,   id }) => {
+  const [styleBlobUrl, setStyleBlobUrl] = useState<string | null>(null);
+  const [classNames, setClassNames] = useState<Array<string>>([]);
+  const [cssRules, setCssRules] = useState<Set<string>>(() => new Set());
+
   const removeOldStylesheet = (linkId: string) => {
     const oldLink = document.getElementById(linkId);
     if (oldLink) {
@@ -26,48 +26,47 @@ export const ClassNameProvider: React.FC<{ children: ReactNode } & Model> = ({ c
     }
   };
   useEffect(() => {
-    if (_Blobobj) {
-      URL.revokeObjectURL(Blob_Url);
+    if (styleBlobUrl) {
+      URL.revokeObjectURL(styleBlobUrl);
     }
-
-    const _str = Array.from(Rules).join('\n');
+    const _str = Array.from(cssRules).join('\n');
     const newBlob = new Blob([_str], { type: 'text/css' });
     const newBlobUrl = window.URL.createObjectURL(newBlob);
 
-    setBlob(newBlob);
-    setBlobUrl(newBlobUrl);
+    setStyleBlobUrl(newBlobUrl);
 
-  }, [Rules]);
+  }, [cssRules]);
 
-  // Step 2: Perform the DOM manipulation in useInsertionEffect
   useInsertionEffect(() => {
-    if (Blob_Url) {
+    if (styleBlobUrl) {
       removeOldStylesheet('dynamic-stylesheet');
 
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = Blob_Url;
+      link.href = styleBlobUrl;
       link.id = 'dynamic-stylesheet';
       document.head.appendChild(link);
     }
-  }, [Blob_Url]);
+  }, [styleBlobUrl]);
 
   
   const injectRuleCss = (newCssRule:string) => {
-      if (!Rules.has(newCssRule)) {
-        setRules(prevSet => new Set(Array.from(prevSet).concat(newCssRule)));
+      if (!cssRules.has(newCssRule)) {
+        setCssRules(prev => new Set(prev).add(newCssRule));
       }
   }
 
   const removeRuleCss = (cssProperty: string) => {
-    setRules(prevSet => {
-      const newSet = new Set(prevSet);
-      newSet.delete(cssProperty);
-      return newSet;
-  });
+    setCssRules(
+      prev => {
+        const next = new Set(prev);
+        next.delete(cssProperty);
+        return next;
+      }
+    );
   };
   const appendClassName = (presecsessor: string, value:string) => {
-    setClassName(prev =>{ 
+    setClassNames(prev =>{ 
       const filtered = prev.filter(ele=>(
         !ele.startsWith(presecsessor)
     ))
@@ -75,21 +74,21 @@ export const ClassNameProvider: React.FC<{ children: ReactNode } & Model> = ({ c
   };
   
   const removeClassName = (presecsessor: string) => {
-    setClassName(prev =>{ 
+    setClassNames(prev =>{ 
       const filtered = prev.filter(ele=>(
         !ele.startsWith(presecsessor)
     ))
-        return [...filtered];
+        return filtered;
       
     });
   };
   
   useEffect(()=>{
-    onChange(new CssWorkers({className:cn(className)}))
-  },[className, Rules])
+    onChange(new CssWorker({className:cn(classNames), blob_url:styleBlobUrl, style_name:`style-${id}`}))
+  },[classNames, cssRules, styleBlobUrl])
 
   return (
-    <ClassNameContext.Provider value={{ className, appendClassName, injectRuleCss, removeRuleCss, removeClassName, OldValue:value  }}>
+    <ClassNameContext.Provider value={{ classNames, appendClassName, injectRuleCss, removeRuleCss, removeClassName, OldValue:value  }}>
       {children}
     </ClassNameContext.Provider>
   );
